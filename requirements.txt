@@ -3,3 +3,4 @@ http.client
 numpy
 pandas
 pillow
+opencv-python
