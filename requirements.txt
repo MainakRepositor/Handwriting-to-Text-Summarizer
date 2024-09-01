@@ -1,6 +1,5 @@
 streamlit
-http.client
-numpy
-pandas
-pillow
 opencv-python
+numpy
+Pillow
+requests
