@@ -4,6 +4,3 @@ numpy
 pandas
 pillow
 opencv-python
-ffmpeg
-libsm6
-libxext6
