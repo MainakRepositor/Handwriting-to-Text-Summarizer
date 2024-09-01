@@ -4,3 +4,4 @@ numpy
 pandas
 pillow
 opencv-python
+libgl
