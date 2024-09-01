@@ -1,0 +1,5 @@
+streamlit
+http.client
+numpy
+pandas
+pillow
