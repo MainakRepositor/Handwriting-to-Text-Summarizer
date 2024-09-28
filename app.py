@@ -118,11 +118,11 @@ def webcam_page():
 
 # Streamlit page navigation
 st.sidebar.title("Navigation")
-options = st.sidebar.radio("Select a page:", ["Home", "Upload Image", "Webcam"])
+options = st.sidebar.radio("Select a page:", ["Home", "Upload Image"]) #"Webcam"
 
 if options == "Home":
     home_page()
 elif options == "Upload Image":
     upload_page()
-elif options == "Webcam":
-    webcam_page()
+# elif options == "Webcam":
+#     webcam_page()
