@@ -44,7 +44,13 @@ def display_detected_text(text):
 # Streamlit pages
 def home_page():
     st.title("Welcome to Handwriting OCR App")
-    st.write("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio.")
+    st.markdown('''**Introduction and Overview:**
+
+Welcome to the **Handwriting OCR App**, a modern solution designed to digitize handwritten text effortlessly using cutting-edge Optical Character Recognition (OCR) technology. Built with Streamlit and powered by an external API, this app offers an intuitive interface for extracting text from both uploaded images and live webcam feeds. Whether you're scanning notes, letters, or any handwritten content, this app ensures accurate and quick conversion of handwritten text into digital form.
+
+The app utilizes a three-page navigation system: the **Home Page** introduces the app, the **Upload Page** allows users to submit an image for text extraction, and the **Webcam Page** offers real-time detection using a webcam. The backend is powered by the **Pen-to-Print Handwriting OCR API**, which processes images and returns detected text in a user-friendly format. The API call is crafted with multipart form data to ensure seamless handling of image uploads, while the app’s frontend is stylized to deliver clear, readable results.
+
+Overall, this project combines simplicity and functionality, providing a robust platform for converting handwritten content into machine-readable text with ease.''')
 
 def upload_page():
     st.title("Upload Handwriting Image")
