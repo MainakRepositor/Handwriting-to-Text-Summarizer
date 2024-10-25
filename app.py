@@ -3,6 +3,8 @@ import http.client
 import cv2
 import numpy as np
 from PIL import Image
+from txtai.pipeline import Summary
+from PyPDF2 import PdfReader
 
 # Helper function to call the handwriting OCR API
 def call_handwriting_api(image_bytes):
@@ -44,11 +46,11 @@ def display_detected_text(text):
 # Streamlit pages
 def home_page():
     st.title("Welcome to Handwriting OCR App")
-    st.markdown('''**Introduction and Overview:**
+    st.markdown('''Introduction and Overview:
 
-Welcome to the **Handwriting OCR App**, a modern solution designed to digitize handwritten text effortlessly using cutting-edge Optical Character Recognition (OCR) technology. Built with Streamlit and powered by an external API, this app offers an intuitive interface for extracting text from both uploaded images and live webcam feeds. Whether you're scanning notes, letters, or any handwritten content, this app ensures accurate and quick conversion of handwritten text into digital form.
+Welcome to the Handwriting OCR App, a modern solution designed to digitize handwritten text effortlessly using cutting-edge Optical Character Recognition (OCR) technology. Built with Streamlit and powered by an external API, this app offers an intuitive interface for extracting text from both uploaded images and live webcam feeds. Whether you're scanning notes, letters, or any handwritten content, this app ensures accurate and quick conversion of handwritten text into digital form.
 
-The app utilizes a three-page navigation system: the **Home Page** introduces the app, the **Upload Page** allows users to submit an image for text extraction, and the **Webcam Page** offers real-time detection using a webcam. The backend is powered by the **Pen-to-Print Handwriting OCR API**, which processes images and returns detected text in a user-friendly format. The API call is crafted with multipart form data to ensure seamless handling of image uploads, while the app’s frontend is stylized to deliver clear, readable results.
+The app utilizes a three-page navigation system: the Home Page introduces the app, the Upload Page allows users to submit an image for text extraction, and the Webcam Page offers real-time detection using a webcam. The backend is powered by the Pen-to-Print Handwriting OCR API, which processes images and returns detected text in a user-friendly format. The API call is crafted with multipart form data to ensure seamless handling of image uploads, while the app’s frontend is stylized to deliver clear, readable results.
 
 Overall, this project combines simplicity and functionality, providing a robust platform for converting handwritten content into machine-readable text with ease.''')
 
@@ -64,71 +66,66 @@ def upload_page():
         img_bytes = uploaded_file.getvalue()
         result = call_handwriting_api(img_bytes)
         
-        # Assuming the result is a JSON string like in the example
         import json
         result_data = json.loads(result)
         
-        # Extracting the text to display
         detected_text = result_data.get("value", "No text detected.")
-        
-        # Display the formatted result
         display_detected_text(detected_text)
 
-def webcam_page():
-    st.title("Webcam Handwriting Detection")
+def summarize_page():
+    st.title("Summarize Text & Document")
+    
+    choice = st.selectbox("Select your choice", ["Summarize Text", "Summarize Document"])
+    
+    @st.cache_resource
+    def text_summary(text):
+        summary = Summary()
+        return summary(text)
+    
+    def extract_text_from_pdf(file_path):
+        with open(file_path, "rb") as f:
+            reader = PdfReader(f)
+            page = reader.pages[0]
+            text = page.extract_text()
+        return text
 
-    # Initialize webcam
-    run = st.checkbox("Run Webcam", key="run_webcam")
+    if choice == "Summarize Text":
+        st.subheader("Summarize Text")
+        input_text = st.text_area("Enter your text here")
+        if st.button("Summarize Text"):
+            col1, col2 = st.columns([1,1])
+            with col1:
+                st.markdown("**Your Input Text**")
+                st.info(input_text)
+            with col2:
+                st.markdown("**Summary Result**")
+                result = text_summary(input_text)
+                st.success(result)
 
-    FRAME_WINDOW = st.image([])
-
-    camera = cv2.VideoCapture(0)
-
-    # Capture button placed outside the loop
-    capture_button = st.button("Capture", key="capture_button")
-
-    while run:
-        # Try to capture a frame from the webcam
-        ret, frame = camera.read()
-        
-        # Check if the frame is captured correctly
-        if not ret:
-            st.write("Error: Failed to capture image from webcam.")
-            continue
-        
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        FRAME_WINDOW.image(frame)
-
-        if capture_button:
-            # Convert the frame to bytes and send to API
-            _, img_encoded = cv2.imencode('.jpg', frame)
-            img_bytes = img_encoded.tobytes()
-            result = call_handwriting_api(img_bytes)
+    elif choice == "Summarize Document":
+        st.subheader("Summarize Document")
+        input_file = st.file_uploader("Upload your document here", type=['pdf'])
+        if input_file and st.button("Summarize Document"):
+            with open("doc_file.pdf", "wb") as f:
+                f.write(input_file.getbuffer())
             
-            # Assuming the result is a JSON string like in the example
-            import json
-            result_data = json.loads(result)
-            
-            # Extracting the text to display
-            detected_text = result_data.get("value", "No text detected.")
-            
-            # Display the formatted result
-            display_detected_text(detected_text)
-
-    else:
-        st.write("Stopped")
-
-    camera.release()
-
-
+            col1, col2 = st.columns([1,1])
+            with col1:
+                extracted_text = extract_text_from_pdf("doc_file.pdf")
+                st.markdown("**Extracted Text is Below:**")
+                st.info(extracted_text)
+            with col2:
+                doc_summary = text_summary(extracted_text)
+                st.markdown("**Summary Result**")
+                st.success(doc_summary)
 
 # Streamlit page navigation
 st.sidebar.title("Navigation")
-options = st.sidebar.radio("Select a page:", ["Home", "Upload Image"]) #"Webcam"
+options = st.sidebar.radio("Select a page:", ["Home", "Upload Image", "Summarize Text & Document"])
 
 if options == "Home":
     home_page()
 elif options == "Upload Image":
     upload_page()
-# elif options == "Webcam":
-#     webcam_page()
+elif options == "Summarize Text & Document":
+    summarize_page()
