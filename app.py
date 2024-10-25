@@ -45,7 +45,7 @@ def display_detected_text(text):
 
 # Streamlit pages
 def home_page():
-    st.title("Welcome to Handwriting OCR App")
+    st.title("Doctor's Handwriting Detection and Summarization")
     st.markdown('''Introduction and Overview:
 
 Welcome to the Handwriting OCR App, a modern solution designed to digitize handwritten text effortlessly using cutting-edge Optical Character Recognition (OCR) technology. Built with Streamlit and powered by an external API, this app offers an intuitive interface for extracting text from both uploaded images and live webcam feeds. Whether you're scanning notes, letters, or any handwritten content, this app ensures accurate and quick conversion of handwritten text into digital form.
